@@ -1,0 +1,79 @@
+from sklearn.svm import SVC
+import numpy as np
+
+x=np.array([[3,4],[1,4],[2,3],[6,-1],[7,-1],[5,-3]])
+y=np.array([-1,-1,-1,1,1,1])
+
+clf=SVC(C=1e5,kernel='linear')
+clf.fit(x,y)
+
+print('w= ',clf.coef_)
+print('b= ',clf.intercept_)
+print('Indices of support vectors = ',clf.support_)
+print('Support vectors = ',clf.support_vectors_)
+print('Number of support vectors for each class = ',clf.n_support_)
+print('Coefficients of the support vector in the decision function = ',np.abs(clf.dual_coef_))
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+df=pd.read_csv("glass.csv")
+print(df)
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+print(scaler.fit_transform(df))
+x=df.drop('Type',axis=1)
+y=df.Type
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.3)
+from sklearn import svm
+ml=svm.SVC(kernel='linear')
+ml.fit(x_train,y_train)
+print(ml.support_vectors_)
+print(ml.n_support_)
+y_pred=ml.predict(x_test)
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+print(accuracy_score(y_test,y_pred))
+print(confusion_matrix(y_test,y_pred))
+print(classification_report(y_test,y_pred))
+model1=SVC(kernel='sigmoid')
+model2=SVC(kernel='poly')
+model3=SVC(kernel='rbf')
+#With Different Kernels
+
+model1.fit(x_train,y_train)
+model2.fit(x_train,y_train)
+model3.fit(x_train,y_train)
+
+ypred1=model1.predict(x_test)
+ypred2=model2.predict(x_test)
+ypred3=model3.predict(x_test)
+
+print(accuracy_score(y_test,ypred1))
+
+print(accuracy_score(y_test,ypred2))
+
+print(accuracy_score(y_test,ypred3))
+[{'kernel':['rbf'],'gamma':[1e-3,1e-4],
+     'C':[1,10,100,1000]},
+{'kernel':['linear'],'C':[1,10,100,1000]},
+{'kernel':['poly'],'gamma':[1e-3,1e-4],'degree':[2,3,4]},
+{'kernel':['sigmoid'],'C':[1,10,100,1000],'gamma':[1e-3,1e-4,1e-5]}]
+params_grid1=[{'kernel':['rbf']},
+             {'kernel':['linear']},
+             {'kernel':['poly']},
+             {'kernel':['sigmoid']}]
+from sklearn.model_selection import GridSearchCV
+svm_model=GridSearchCV(SVC(),params_grid1,cv=5)
+svm_model.fit(x_train,y_train)
+
+print('Best score for training data:',svm_model.best_score_,"\n")
+
+#View the best parameters for the model found using grid search
+print('Best C:',svm_model.best_estimator_.C,"\n")
+print('Best Kernel:',svm_model.best_estimator_.kernel,"\n")
+print('Best Gamma:',svm_model.best_estimator_.gamma,"\n")
+
+final_model=svm_model.best_estimator_
+Y_pred=final_model.predict(x_test)
+
+print(accuracy_score(y_test,Y_pred))
